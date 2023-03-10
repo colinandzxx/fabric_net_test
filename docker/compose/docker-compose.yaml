@@ -1,0 +1,102 @@
+version: '3.7'
+
+networks:
+  fabric-network:
+
+
+services:
+
+  ca.origin.myproject.com:
+    container_name: ca.origin.myproject.com
+    extends:
+      file: docker-base.yaml
+      service: ca-base
+    command: sh -c 'fabric-ca-server start -d -b ca-admin:ca-adminpw --port 7050'
+    environment:
+      - FABRIC_CA_SERVER_CSR_CN=ca.origin.myproject.com
+      - FABRIC_CA_SERVER_CSR_HOSTS=ca.origin.myproject.com
+    volumes:
+      - ${LOCAL_CA_PATH}/ca.origin.myproject.com/ca:${DOCKER_CA_PATH}/ca
+    ports:
+      - 7050:7050
+
+  peer1.origin.myproject.com:
+    container_name: peer1.origin.myproject.com
+    extends:
+      file: docker-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.origin.myproject.com
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8050
+      - CORE_PEER_ADDRESS=peer1.origin.myproject.com:8050
+      - CORE_PEER_LOCALMSPID=originmyprojectcommsp
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.origin.myproject.com:8050
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.origin.myproject.com:8050
+      - CORE_PEER_TLS_ROOTCERT_FILE=${DOCKER_CA_PATH}/peer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem
+      - CORE_PEER_CHAINCODEADDRESS=peer1.origin.myproject.com:8052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
+    volumes:
+      - ${LOCAL_CA_PATH}/ca.origin.myproject.com/registers/peer1:${DOCKER_CA_PATH}/peer
+    ports:
+      - 8050:8050
+      - 8052:8052
+
+  orderer1.origin.myproject.com:
+    container_name: orderer1.origin.myproject.com
+    extends:
+      file: docker-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_HOST=orderer1.origin.myproject.com
+      - ORDERER_GENERAL_LOCALMSPID=originmyprojectcommsp
+      - ORDERER_GENERAL_LISTENPORT=9050
+      - ORDERER_GENERAL_TLS_ROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+      - ORDERER_ADMIN_TLS_ROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+    volumes:
+      - ${LOCAL_CA_PATH}/ca.origin.myproject.com/registers/orderer1:${DOCKER_CA_PATH}/orderer
+    ports:
+      - 9050:9050
+      - 9051:8888
+      - 9052:9999
+
+  orderer2.origin.myproject.com:
+    container_name: orderer2.origin.myproject.com
+    extends:
+      file: docker-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_HOST=orderer2.origin.myproject.com
+      - ORDERER_GENERAL_LOCALMSPID=originmyprojectcommsp
+      - ORDERER_GENERAL_LISTENPORT=9053
+      - ORDERER_GENERAL_TLS_ROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+      - ORDERER_ADMIN_TLS_ROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+    volumes:
+      - ${LOCAL_CA_PATH}/ca.origin.myproject.com/registers/orderer2:${DOCKER_CA_PATH}/orderer
+    ports:
+      - 9053:9053
+      - 9054:8888
+      - 9055:9999
+
+  orderer3.origin.myproject.com:
+    container_name: orderer3.origin.myproject.com
+    extends:
+      file: docker-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_HOST=orderer3.origin.myproject.com
+      - ORDERER_GENERAL_LOCALMSPID=originmyprojectcommsp
+      - ORDERER_GENERAL_LISTENPORT=9056
+      - ORDERER_GENERAL_TLS_ROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+      - ORDERER_ADMIN_TLS_ROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[${DOCKER_CA_PATH}/orderer/tls-msp/tlscacerts/tls-ca-origin-myproject-com-7050.pem]
+    volumes:
+      - ${LOCAL_CA_PATH}/ca.origin.myproject.com/registers/orderer3:${DOCKER_CA_PATH}/orderer
+    ports:
+      - 9056:9056
+      - 9057:8888
+      - 9058:9999
